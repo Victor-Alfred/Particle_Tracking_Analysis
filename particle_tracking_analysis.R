@@ -1,3 +1,5 @@
+# script to analyse results of particle tracking
+
 setwd("Desktop/Particle_Tracking_Analysis/")
 
 setwd("C:/Users/spind/OneDrive - sheffield.ac.uk/R_tracking/") # on Home PC
