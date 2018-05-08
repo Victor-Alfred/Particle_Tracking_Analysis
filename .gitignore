@@ -5,3 +5,6 @@
 !.gitignore
 !particle_tracking_analysis.R
 !*.R
+
+# ...even if they are in subdirectories
+!*/
