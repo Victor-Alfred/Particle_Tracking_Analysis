@@ -3,5 +3,5 @@
 
 # But not these files...
 !.gitignore
-! particle_tracking_analysis.R
-! *.R
+!particle_tracking_analysis.R
+!*.R
