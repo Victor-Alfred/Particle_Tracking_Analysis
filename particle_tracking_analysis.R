@@ -15,7 +15,7 @@ display.brewer.all()
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("Dhc64c_BL36583_2.csv")) 
+newtracks <- data.frame(read.csv("W01.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
@@ -66,7 +66,7 @@ tracks_calc <- function (a, b){
 
 tracks_summary <- tracks_calc(newtracks, newtracks_firstrows)
 
-write.csv(tracks_summary, "Dhc64c_BL36583_2.csv")  # save new dataframe
+# write.csv(tracks_summary, "W01.csv")  # save new dataframe
 # tracks <- as.data.frame(read.csv("tracks_summary.csv"))
 
 # create subsets of negative and positive long-axis(Y) displacements
@@ -142,7 +142,7 @@ tracks_all_norm <- as.data.frame(Reduce
                                         list(tracks_norm, Y_POS_norm, Y_NEG_norm)))
 names(tracks_all_norm)[c(4, 7, 10)] <- c("ALL_NORM","POS_NORM", "NEG_NORM")
 
-write.csv(tracks_all_norm, "Dhc64c_BL36583_2_norm.csv")
+# write.csv(tracks_all_norm, "Dhc64c_BL36583_2_norm.csv")
 
 #############################################################################
 
