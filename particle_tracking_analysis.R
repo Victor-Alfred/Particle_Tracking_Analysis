@@ -15,7 +15,7 @@ display.brewer.all()
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("W01.csv")) 
+newtracks <- data.frame(read.csv("W01_1.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
@@ -142,7 +142,7 @@ tracks_all_norm <- as.data.frame(Reduce
                                         list(tracks_norm, Y_POS_norm, Y_NEG_norm)))
 names(tracks_all_norm)[c(4, 7, 10)] <- c("ALL_NORM","POS_NORM", "NEG_NORM")
 
-# write.csv(tracks_all_norm, "Dhc64c_BL36583_2_norm.csv")
+write.csv(tracks_all_norm, "W01_1_norm.csv")
 
 #############################################################################
 
