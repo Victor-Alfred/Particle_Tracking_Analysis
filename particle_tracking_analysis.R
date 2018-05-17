@@ -1,8 +1,8 @@
 # script to analyse results of particle tracking
 
-setwd("Desktop/Particle_Tracking_Analysis/")
-
 setwd("C:/Users/spind/OneDrive - sheffield.ac.uk/R_tracking/") # on Home PC
+
+setwd("/Users/victoralfred/Desktop/Live_analysis/white")
 
 rm(list=ls())
 
@@ -10,12 +10,12 @@ library(ggplot2)
 library(dplyr)
 library(lattice)
 library(RColorBrewer)
-display.brewer.all()
+# display.brewer.all()
 
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("W01_1.csv")) 
+newtracks <- data.frame(read.csv("8c_tracks.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
@@ -142,7 +142,7 @@ tracks_all_norm <- as.data.frame(Reduce
                                         list(tracks_norm, Y_POS_norm, Y_NEG_norm)))
 names(tracks_all_norm)[c(4, 7, 10)] <- c("ALL_NORM","POS_NORM", "NEG_NORM")
 
-write.csv(tracks_all_norm, "W01_1_norm.csv")
+write.csv(tracks_all_norm, "temp_norm.csv")
 
 #############################################################################
 
@@ -151,15 +151,7 @@ write.csv(tracks_all_norm, "W01_1_norm.csv")
 #################################################################
 
 
-  annotate("text", 27, 1.8, 
-           label = paste("n_particles =", nrow(newtracks_firstrows), 
-                         "\nn_events =", nrow(tracks_summary), 
-                         "\nt_interval =",
-                         sort(tracks_summary$TIME,
-                              partial=(length(tracks_summary$TIME))-1)[2]*1000,
-                         "msec",
-                         collapse = " "), size = 5, hjust = 0)
-
+  
 #############################################
 
 # normalised displacement with angle for all single displacements
@@ -196,6 +188,18 @@ ggplot(na.omit(tracks_norm), aes(x=ANGLE_CAT,y=DISP_NORM)) +
                          collapse = " "), size = 5, hjust = 0)
 
 ###########################################################
+
+annotate("text", 27, 1.8, 
+         label = paste("n_particles =", nrow(newtracks_firstrows), 
+                       "\nn_events =", nrow(tracks_summary), 
+                       "\nt_interval =",
+                       sort(tracks_summary$TIME,
+                            partial=(length(tracks_summary$TIME))-1)[2]*1000,
+                       "msec",
+                       collapse = " "), size = 5, hjust = 0)
+
+
+####################################################
 
  # normalised displacemnt with angle for Y_POS....downward?
   
@@ -255,6 +259,28 @@ ggplot(na.omit(Y_NEG_norm), aes(x=ANGLE_CAT,y=DISP_NORM)) +
 
 ############################################################
 ##########################################################
+
+# Mean velocity per angle bin for individual displacements
+
+ggplot(na.omit(tracks_summary), aes(x=ANGLE_CAT,y=VELOCITY)) +  
+  geom_bar(stat = "summary", fun.y = "mean", width = 0.9, fill ="black", 
+           col ="black", position="dodge") + theme_bw() +
+  scale_x_discrete(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0), 
+                     breaks = round(seq(0, max(tracks_summary$DISP_2),
+                                        by = 0.05),2)) +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust =1),
+        axis.text.y = element_text(size = 10, vjust =1)) +
+  xlab("Angle of displacement (deg)") +
+  ylab("Mean individual displacement (um)") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position="none", 
+        axis.title=element_text(size=15))
+
 #################################################################
 
 # Mean displacement per angle bin for individual displacements
