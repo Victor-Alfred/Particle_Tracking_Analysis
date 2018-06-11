@@ -1,8 +1,8 @@
 # script to analyse results of particle tracking
 
-setwd("C:/Users/spind/OneDrive - sheffield.ac.uk/R_tracking/") # on Home PC
+setwd("C:/Users/spind/OneDrive - sheffield.ac.uk/1_Live_analysis/white/") # on Home PC
 
-setwd("/Users/victoralfred/Desktop/Live_analysis/white")
+setwd("/Users/victoralfred/Desktop/Live_analysis/Spastin")
 
 rm(list=ls())
 
@@ -15,7 +15,7 @@ library(RColorBrewer)
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("8c_tracks.csv")) 
+newtracks <- data.frame(read.csv("1a_tracks.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
@@ -175,6 +175,7 @@ ggplot(na.omit(tracks_norm), aes(x=ANGLE_CAT,y=DISP_NORM)) +
         legend.position="none", 
         axis.title=element_text(size=15)) 
 
+################################
 +
   annotate("text", 32, 0.07, 
            label = paste("n_particles =", nrow(newtracks_firstrows), 
