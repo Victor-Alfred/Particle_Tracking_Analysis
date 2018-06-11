@@ -18,6 +18,7 @@ str(robustness_data)
 
 ###########################
 
+# obtained from ....
 ggplotRegression <- function (fit) {
   
   require(ggplot2)
@@ -68,7 +69,7 @@ getPalette = colorRampPalette(brewer.pal(8, "Accent"))
 
 ##################################
 
-# Obtain regression equation for each group of genotype
+# Obtain regression equation for each group of genotype: obtained from ....
 
 equation = function(file, y = file$von_mises_SD, x=file$eccentricity) {
   mod = lm(y ~ x,data=file)
@@ -161,6 +162,32 @@ fmCOS <- lm(von_mises_SD ~ Genotype + eccentricity/is.COS, robustness_data);
 anova(fm1, fmCOS)
 
 ########################################
+
+#  from: https://www.r-bloggers.com/can-we-do-better-than-r-squared/
+# estimated predictive R2
+
+PRESS <- function(linear.model) {
+  pr <- residuals(linear.model)/(1 - lm.influence(linear.model)$hat)
+  PRESS <- sum(pr^2)
+  return(PRESS)
+}
+
+pred_r_squared <- function(linear.model) {
+  lm.anova <- anova(linear.model)
+  tss <- sum(lm.anova$"Sum Sq")
+  # predictive R^2
+  pred.r.squared <- 1 - PRESS(linear.model)/(tss)
+  return(pred.r.squared)
+}
+
+# linear model
+
+fit <- lm(von_mises_SD ~ eccentricity, robustness_data)
+
+pred.r.squared <- pred_r_squared(fit)
+pred.r.squared
+
+###########################################
 
 robustness_data$transport_deviation = abs(robustness_data$cell_direction - robustness_data$transport_direction)
 
