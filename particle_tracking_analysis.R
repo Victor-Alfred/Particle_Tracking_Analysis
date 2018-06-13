@@ -2,7 +2,7 @@
 
 setwd("C:/Users/spind/OneDrive - sheffield.ac.uk/1_Live_analysis/white/") # on Home PC
 
-setwd("/Users/victoralfred/Desktop/Live_analysis/Spastin")
+setwd("/Users/victoralfred/Desktop/1_Live_analysis/white")
 
 rm(list=ls())
 
@@ -15,7 +15,7 @@ library(RColorBrewer)
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("1a_tracks.csv")) 
+newtracks <- data.frame(read.csv("1a_WT_SPAS_tracks.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
