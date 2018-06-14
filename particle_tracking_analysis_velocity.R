@@ -83,9 +83,33 @@ ggplot(data = tracks_summary) +
   geom_vline(aes(xintercept=mean(VELOCITY_AUT, na.rm=T)),   # Ignore NA values for mean
              color="red", linetype="dashed", size=0.5) +
   geom_density(aes(x = VELOCITY, y=(..count..)/sum(..count..)), 
-                 alpha=0.3,, fill ="green",binwidth=10,position="dodge") +
+                 alpha=0.3, fill ="green",binwidth=10,position="dodge") +
   geom_vline(aes(xintercept=mean(VELOCITY, na.rm=T)),   # Ignore NA values for mean
              color="green", linetype="dashed", size=0.5) +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10)) +
+  xlab("Velocity") +
+  #ylab("Proportion") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.background = element_blank(), 
+        axis.title=element_text(size=15),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10))
+
+##
+
+ggplot(data = tracks_summary) +
+  geom_histogram(aes(x = VELOCITY_AUT, y=(..count..)/sum(..count..)), 
+               alpha=0.5, fill ="red",colour = "lightgray", binwidth=0.1,position="dodge") +
+  geom_vline(aes(xintercept=mean(VELOCITY_AUT, na.rm=T)),   # Ignore NA values for mean
+             color="darkred", linetype="dashed", size=0.5) +
+  geom_histogram(aes(x = VELOCITY, y=(..count..)/sum(..count..)), 
+               alpha=0.5, fill ="green",colour = "lightgray", binwidth=0.1,position="dodge") +
+  geom_vline(aes(xintercept=mean(VELOCITY, na.rm=T)),   # Ignore NA values for mean
+             color="darkgreen", linetype="dashed", size=0.5)+
   scale_x_continuous(expand = c(0, 0)) + 
   scale_y_continuous(expand = c(0, 0)) +
   theme(axis.text.x = element_text(size = 10),
@@ -99,24 +123,8 @@ ggplot(data = tracks_summary) +
         axis.text.x = element_text(size = 10),
         axis.text.y = element_text(size = 10))
 
-##
-
-ggplot(data = tracks_summary) +
-  geom_histogram(aes(x = VELOCITY_AUT, y=(..count..)/sum(..count..)), 
-               alpha=0.3, fill ="red",binwidth=2,position="dodge") +
-  geom_vline(aes(xintercept=mean(VELOCITY_AUT, na.rm=T)),   # Ignore NA values for mean
-             color="red", linetype="dashed", size=0.5) +
-  geom_histogram(aes(x = VELOCITY, y=(..count..)/sum(..count..)), 
-               alpha=0.3,, fill ="green",binwidth=2,position="dodge") +
-  geom_vline(aes(xintercept=mean(VELOCITY, na.rm=T)),   # Ignore NA values for mean
-             color="green", linetype="dashed", size=0.5)
-
-
 
 ######################################
-
-# write.csv(tracks_summary, "W01.csv")  # save new dataframe
-# tracks <- as.data.frame(read.csv("tracks_summary.csv"))
 
 # create subsets of negative and positive long-axis(Y) displacements
 Y_POS <- subset(tracks_summary,  Y_SINGLE > 0)
@@ -137,11 +145,11 @@ mean(na.omit(Y_NEG$VELOCITY))
 
 #create normalised DISP for all displacements
 
-tracks_norm <- as.data.frame(aggregate(tracks_summary$DISP_2 ~ tracks_summary$ANGLE_CAT,
-                                       tracks_summary, sum))
-names(tracks_norm) <- c("ANGLE_CAT", "DISP_SUM")
-tracks_norm$DISP_NORM <- tracks_norm$DISP_SUM / sum(tracks_norm$DISP_SUM)
-sum(tracks_norm$DISP_NORM)==1  # this should always be TRUE
+tracks_norm <- as.data.frame(aggregate(tracks_summary$VELOCITY ~ tracks_summary$ANGLE_CAT,
+                                       tracks_summary, mean))
+names(tracks_norm) <- c("ANGLE_CAT", "VEL_MEAN")
+tracks_norm$VEL_NORM <- tracks_norm$VEL_MEAN / sum(tracks_norm$VEL_MEAN)
+sum(tracks_norm$VEL_NORM)==1  # this should always be TRUE
 
 # get the size of each bin, i.e. no of events within each angle
 # n_events <- aggregate(tracks_summary$DISP_2 ~ tracks_summary$ANGLE_CAT, 
@@ -161,20 +169,20 @@ tracks_norm <- tracks_norm[order(tracks_norm$ANGLE_CLASS),]
 
 # create normalised DISP data for all positive and negative displacements
 
-Y_POS_norm <- as.data.frame(aggregate(Y_POS$DISP_2 ~ Y_POS$ANGLE_CAT, Y_POS, sum))
-names(Y_POS_norm) <- c("ANGLE_CAT", "DISP_SUM")
-Y_POS_norm$DISP_NORM <- Y_POS_norm$DISP_SUM / sum(Y_POS_norm$DISP_SUM)
-sum(Y_POS_norm$DISP_NORM) == 1
+Y_POS_norm <- as.data.frame(aggregate(Y_POS$VELOCITY ~ Y_POS$ANGLE_CAT, Y_POS, mean))
+names(Y_POS_norm) <- c("ANGLE_CAT", "VEL_MEAN")
+Y_POS_norm$VEL_NORM <- Y_POS_norm$VEL_MEAN / sum(Y_POS_norm$VEL_MEAN)
+sum(Y_POS_norm$VEL_NORM) == 1
 
 Y_POS_norm$ANGLE_CLASS <- midpoints(Y_POS_norm$ANGLE_CAT)
 Y_POS_norm <- Y_POS_norm[, c(1, 4, 2, 3)]
 Y_POS_norm <- Y_POS_norm[order(Y_POS_norm$ANGLE_CLASS),]
 
 
-Y_NEG_norm <- as.data.frame(aggregate(Y_NEG$DISP_2 ~ Y_NEG$ANGLE_CAT, Y_NEG, sum))
-names(Y_NEG_norm) <- c("ANGLE_CAT", "DISP_SUM")
-Y_NEG_norm$DISP_NORM <- Y_NEG_norm$DISP_SUM / sum(Y_NEG_norm$DISP_SUM)
-sum(Y_NEG_norm$DISP_NORM) == 1
+Y_NEG_norm <- as.data.frame(aggregate(Y_NEG$VELOCITY ~ Y_NEG$ANGLE_CAT, Y_NEG, mean))
+names(Y_NEG_norm) <- c("ANGLE_CAT", "VEL_MEAN")
+Y_NEG_norm$VEL_NORM <- Y_NEG_norm$VEL_MEAN / sum(Y_NEG_norm$VEL_MEAN)
+sum(Y_NEG_norm$VEL_NORM) == 1
 
 Y_NEG_norm$ANGLE_CLASS <- midpoints(Y_NEG_norm$ANGLE_CAT)
 Y_NEG_norm <- Y_NEG_norm[, c(1, 4, 2, 3)]
@@ -192,3 +200,24 @@ tracks_all_norm <- as.data.frame(Reduce
 names(tracks_all_norm)[c(4, 7, 10)] <- c("ALL_NORM","POS_NORM", "NEG_NORM")
 
 write.csv(tracks_all_norm, "temp_norm.csv")
+
+#####################
+
+ggplot(na.omit(tracks_norm), aes(x=ANGLE_CAT, y=VEL_NORM)) +  
+  geom_bar(stat = "identity", width = 0.9, fill ="black", 
+           col ="black", position="dodge") + theme_bw() +
+  scale_x_discrete(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust =1),
+        axis.text.y = element_text(size = 10, vjust =1)) +
+  xlab("Angle of Displacement (degrees)") +
+  ylab("Normalised displacement") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position="none", 
+        axis.title=element_text(size=15)) 
+
+
