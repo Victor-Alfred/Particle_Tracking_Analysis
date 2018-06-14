@@ -15,12 +15,15 @@ library(RColorBrewer)
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("small_box_tracks.csv")) 
+newtracks <- data.frame(read.csv("1a_spots_tracks.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
 newtracks <- subset(newtracks, ave(TRACK_ID, TRACK_ID, FUN = length) >
                       (max(table(newtracks$TRACK_ID))/2))
+
+newtracks <- subset(newtracks, ave(TRACK_ID, TRACK_ID, FUN = length) > 48)
+
 
 # identify firstrows for each particle
 newtracks_firstrows <- newtracks[ diff(c(0,newtracks$TRACK_ID)) != 0, ]
@@ -109,6 +112,8 @@ tracks_summary <- tracks_calc(newtracks, newtracks_firstrows)
 
 # write.csv(tracks_summary, "W01.csv")  # save new dataframe
 # tracks <- as.data.frame(read.csv("tracks_summary.csv"))
+
+####################################
 
 # create subsets of negative and positive long-axis(Y) displacements
 Y_POS <- subset(tracks_summary,  Y_SINGLE > 0)

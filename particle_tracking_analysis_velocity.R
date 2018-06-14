@@ -171,7 +171,7 @@ mean(na.omit(Y_NEG$VELOCITY))
 
 ################################################
 
-#create normalised DISP for all displacements
+#create normalised DISP for all VELOCITIES
 
 tracks_norm <- as.data.frame(aggregate(tracks_summary$VELOCITY ~ tracks_summary$ANGLE_CAT,
                                        tracks_summary, mean))
