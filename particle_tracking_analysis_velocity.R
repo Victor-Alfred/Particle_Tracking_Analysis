@@ -33,20 +33,20 @@ pos_angles <- function(x) {
 }
 
 # function to calculate displacements and angles
+
 tracks_calc <- function (a, b){
   c <- within(merge(a,b,by="TRACK_ID"), {
-    EDGE_TIME <- EDGE_TIME.x
-    TIME <- EDGE_TIME.x - EDGE_TIME.y
-    X_LOCATION <- EDGE_X_LOCATION.x
-    Y_LOCATION <- EDGE_Y_LOCATION.x
-    DISP_X <- EDGE_X_LOCATION.x - EDGE_X_LOCATION.y # .y is the origin
-    DISP_Y <- EDGE_Y_LOCATION.x - EDGE_Y_LOCATION.y
+    EDGE_TIME <- POSITION_T.x
+    TIME <- POSITION_T.x - POSITION_T.y
+    X_LOCATION <- POSITION_X.x
+    Y_LOCATION <- POSITION_Y.x
+    DISP_X <- POSITION_X.x - POSITION_X.y # .y is the origin
+    DISP_Y <- POSITION_Y.x - POSITION_Y.y
     DISP <- sqrt((DISP_X)^2 + (DISP_Y)^2)
     DISP_TYPE <- ifelse(DISP_Y >=0, "POS", "NEG")
     ANGLE <- sapply((atan2(DISP_Y, DISP_X)*180)/pi, pos_angles)
     ANGLE_RAD <- (ANGLE*pi)/180
     # ANGLE_CAT<-cut(ANGLE, seq(0,180,4), include.lowest = TRUE)
-    VELOCITY_AUT <- VELOCITY.x  # automatically calculated velocity
     X_SINGLE <- ave(X_LOCATION, TRACK_ID,
                     FUN=function(x) c(0, diff(x))) # individual displacements along X
     Y_SINGLE <- ave(Y_LOCATION, TRACK_ID,   #individul displacements along Y
@@ -55,12 +55,11 @@ tracks_calc <- function (a, b){
     ANGLE_SINGLE <- sapply((atan2(Y_SINGLE, X_SINGLE)*180)/pi, pos_angles)
     ANGLE_SINGLE_RAD <- (ANGLE_SINGLE*pi)/180
     ANGLE_CAT <-cut(ANGLE_SINGLE, seq(0,180,4), include.lowest = TRUE)
-    TIME_SINGLE <- ave(TIME, TRACK_ID,
+    TIME_SINGLE <- ave(EDGE_TIME, TRACK_ID,
                        FUN=function(x) c(0, diff(x)))
     VELOCITY <- DISP_2/TIME_SINGLE
   })[,c("TRACK_ID","EDGE_TIME", "TIME","X_LOCATION", "Y_LOCATION",
-        "DISP_X","DISP_Y", "DISP","DISP_TYPE", "ANGLE", "ANGLE_RAD", 
-        "VELOCITY_AUT", "X_SINGLE", "Y_SINGLE", "DISP_2", "ANGLE_SINGLE", "ANGLE_SINGLE_RAD",
+        "DISP_X","DISP_Y", "DISP","DISP_TYPE", "ANGLE", "ANGLE_RAD", "X_SINGLE", "Y_SINGLE", "DISP_2", "ANGLE_SINGLE", "ANGLE_SINGLE_RAD",
         "ANGLE_CAT", "TIME_SINGLE", "VELOCITY")]
   return(as.data.frame(c))
 }
@@ -76,6 +75,35 @@ library(ggplot2)
 
 mean(tracks_summary$VELOCITY, na.rm=T); mean(tracks_summary$VELOCITY_AUT, na.rm=T)
 sd(tracks_summary$VELOCITY, na.rm=T); sd(tracks_summary$VELOCITY_AUT, na.rm=T)
+
+ggplot(data = na.omit(tracks_summary)) +
+  geom_histogram(aes(x = VELOCITY, y=..density..), 
+                 alpha=0.5, fill ="black", colour = "black", binwidth=0.2,position="dodge") +
+  geom_density(aes(x = VELOCITY, y=..density..), 
+               alpha=0.3, #fill ="red",
+               binwidth=10,position="dodge") +
+  geom_vline(aes(xintercept=mean(VELOCITY, na.rm=T)),   # Ignore NA values for mean
+             color="red", linetype="dashed", size=0.5) +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10)) +
+  xlab("Velocity") +
+  ylab("Density") +
+  theme(axis.line = element_line(colour = "black"),
+        panel.border = element_blank(),
+        panel.background = element_blank(), 
+        axis.title=element_text(size=15),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10))
+
+
+##################################
+
+
+#################################
+
+ # Comparing 2 sets of velocity values
 
 ggplot(data = tracks_summary) +
   geom_density(aes(x = VELOCITY_AUT, y=(..count..)/sum(..count..)), 

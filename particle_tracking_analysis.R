@@ -15,7 +15,7 @@ library(RColorBrewer)
 
 
 # read in datafiles using   data.frame(read.csv("XXXXXXXX>csv"))
-newtracks <- data.frame(read.csv("1a_WT_SPAS_tracks.csv")) 
+newtracks <- data.frame(read.csv("small_box_tracks.csv")) 
 
 # create dataframe subset of only those tracks that occur in at least half of the time points
 max(table(newtracks$TRACK_ID))
@@ -31,7 +31,12 @@ pos_angles <- function(x) {
   return(x)
 }
 
+#########################
+
 # function to calculate displacements and angles
+
+# used with the "links in tracks" file from trackmate
+
 tracks_calc <- function (a, b){
   c <- within(merge(a,b,by="TRACK_ID"), {
     EDGE_TIME <- EDGE_TIME.x
@@ -63,6 +68,42 @@ tracks_calc <- function (a, b){
         "ANGLE_CAT", "TIME_SINGLE", "VELOCITY")]
   return(as.data.frame(c))
 }
+
+#####################################
+ # used with the "spots in tracks" file from trackmate
+
+tracks_calc <- function (a, b){
+  c <- within(merge(a,b,by="TRACK_ID"), {
+    EDGE_TIME <- POSITION_T.x
+    TIME <- POSITION_T.x - POSITION_T.y
+    X_LOCATION <- POSITION_X.x
+    Y_LOCATION <- POSITION_Y.x
+    DISP_X <- POSITION_X.x - POSITION_X.y # .y is the origin
+    DISP_Y <- POSITION_Y.x - POSITION_Y.y
+    DISP <- sqrt((DISP_X)^2 + (DISP_Y)^2)
+    DISP_TYPE <- ifelse(DISP_Y >=0, "POS", "NEG")
+    ANGLE <- sapply((atan2(DISP_Y, DISP_X)*180)/pi, pos_angles)
+    ANGLE_RAD <- (ANGLE*pi)/180
+    # ANGLE_CAT<-cut(ANGLE, seq(0,180,4), include.lowest = TRUE)
+    X_SINGLE <- ave(X_LOCATION, TRACK_ID,
+                    FUN=function(x) c(0, diff(x))) # individual displacements along X
+    Y_SINGLE <- ave(Y_LOCATION, TRACK_ID,   #individul displacements along Y
+                    FUN=function(x) c(0, diff(x)))
+    DISP_2 <- sqrt((X_SINGLE)^2 + (Y_SINGLE)^2)  # individual displacements
+    ANGLE_SINGLE <- sapply((atan2(Y_SINGLE, X_SINGLE)*180)/pi, pos_angles)
+    ANGLE_SINGLE_RAD <- (ANGLE_SINGLE*pi)/180
+    ANGLE_CAT <-cut(ANGLE_SINGLE, seq(0,180,4), include.lowest = TRUE)
+    TIME_SINGLE <- ave(EDGE_TIME, TRACK_ID,
+                       FUN=function(x) c(0, diff(x)))
+    VELOCITY <- DISP_2/TIME_SINGLE
+  })[,c("TRACK_ID","EDGE_TIME", "TIME","X_LOCATION", "Y_LOCATION",
+        "DISP_X","DISP_Y", "DISP","DISP_TYPE", "ANGLE", "ANGLE_RAD", "X_SINGLE", "Y_SINGLE", "DISP_2", "ANGLE_SINGLE", "ANGLE_SINGLE_RAD",
+        "ANGLE_CAT", "TIME_SINGLE", "VELOCITY")]
+  return(as.data.frame(c))
+}
+
+
+##################
 
 tracks_summary <- tracks_calc(newtracks, newtracks_firstrows)
 
