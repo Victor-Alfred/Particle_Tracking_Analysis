@@ -22,7 +22,7 @@ max(table(newtracks$TRACK_ID))
 newtracks <- subset(newtracks, ave(TRACK_ID, TRACK_ID, FUN = length) >
                       (max(table(newtracks$TRACK_ID))/2))
 
-newtracks <- subset(newtracks, ave(TRACK_ID, TRACK_ID, FUN = length) > 48)
+newtracks <- subset(newtracks, ave(TRACK_ID, TRACK_ID, FUN = length) > 40)
 
 
 # identify firstrows for each particle
